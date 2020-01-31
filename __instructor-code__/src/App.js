@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './mainStreetAuto.svg';
 import axios from 'axios';
 import './App.css';
+import {baseURL} from './resources'
 
 // Toast notification dependencies
 import { ToastContainer, toast } from 'react-toastify';
@@ -29,43 +30,25 @@ class App extends Component {
   }
 
   getVehicles() {
-    // axios (GET)
+    axios.get(`${baseURL}/vehicles`).then(responseObj => {
+      toast.success('Successfully got vehicles')
+      this.setState({vehiclesToDisplay: responseObj.data})
+    }).catch( (err) => toast.error('Failed at fetching Vehicles'))// axios (GET)
     // setState with response -> vehiclesToDisplay
-
-    axios.get('https://joes-autos.herokuapp.com/api/vehicles').then(response => {
-      toast.success('Successfully get vehicles')
-      this.setState({
-        vehiclesToDisplay: response.data
-      })
-    })
-    .catch(err => toast.error('Failed at fetching Vehicles: ' + err))
   }
 
   getPotentialBuyers() {
     // axios (GET)
     // setState with response -> buyersToDisplay
-
-    axios.get('https://joes-autos.herokuapp.com/api/buyers').then(response => {
-      toast.success('Successfully get buyers')
-      this.setState({
-        buyersToDisplay: response.data
-      })
-    })
-    .catch(err => toast.error('Failed at fetching Buyers: ' + err))
   }
 
   sellCar(id) {
+    axios.delete(`https://joes-autos.herokuapp.com/api/vehicles/${id}`).then(response => {
+      toast.success('Car successfully deleted!')
+      this.setState({vehiclesToDisplay: response.data.vehicles})
+    }).catch(err => toast.error('Failed at selling car!'))
     // axios (DELETE)
     // setState with response -> vehiclesToDisplay
-
-    axios.delete(`https://joes-autos.herokuapp.com/api/vehicles/${id}`)
-    .then(response => {
-      toast.success('Success Sell')
-      this.setState({
-        vehiclesToDisplay: response.data.vehicles
-      })
-    }).catch(err => toast.error(err))
-
   }
 
   filterByMake() {
@@ -73,14 +56,6 @@ class App extends Component {
 
     // axios (GET)
     // setState with response -> vehiclesToDisplay
-
-    axios.get('https://joes-autos.herokuapp.com/api/vehicles').then(response => {
-      toast.success('success fliter make')
-      const filterMake = response.data.filter(element => element.make === make)
-      this.setState({
-        vehiclesToDisplay: filterMake
-      })
-    }).catch(err => toast.error(err))
   }
 
   filterByColor() {
@@ -88,31 +63,18 @@ class App extends Component {
 
     // axios (GET)
     // setState with response -> vehiclesToDisplay
-
-    axios.get('https://joes-autos.herokuapp.com/api/vehicles').then(response => {
-      toast.success('Success Filter Color')
-      this.setState({
-        vehiclesToDisplay: response.data.filter(element => element.color === color)
-      })
-    }).catch(err => toast.error(err))
   }
 
   updatePrice(priceChange, id) {
+    axios.put(`https://joes-autos.herokuapp.com/api/vehicles/${id}/${priceChange}`).then(response => {
+      toast.success('Great Success!')
+      this.setState({vehiclesToDisplay: response.data.vehicles})
+    })
     // axios (PUT)
     // setState with response -> vehiclesToDisplay
-
-    axios.put(`https://joes-autos.herokuapp.com/api/vehicles/${id}/${priceChange}`)
-    .then(response => {
-      toast.success('Successfully')
-      this.setState({
-        vehiclesToDisplay: response.data.vehicles
-      })
-    })
-    .catch(err => toast.error('Failing at'))
   }
 
   addCar() {
-    console.log("hits")
     let newCar = {
       make: this.make.value,
       model: this.model.value,
@@ -121,15 +83,11 @@ class App extends Component {
       price: this.price.value
     };
 
-    // axios (POST)
+   axios.post(`https://joes-autos.herokuapp.com/api/vehicles`, newCar).then(response => {
+     toast.success('Card Added!')
+     this.setState({vehiclesToDisplay: response.data.vehicles})
+   }).catch(err => toast.error(`Add Car Failed!`)) // axios (POST)
     // setState with response -> vehiclesToDisplay
-
-    axios.post('https://joes-autos.herokuapp.com/api/vehicles', newCar)
-    .then(response => {
-      this.setState({
-        vehiclesToDisplay: response.data.vehicles
-      })
-    }).catch(err => toast.error("Add Car Failed"))
   }
 
   addBuyer() {
@@ -141,25 +99,11 @@ class App extends Component {
 
     //axios (POST)
     // setState with response -> buyersToDisplay
-
-    axios.post('https://joes-autos.herokuapp.com/api/buyers', newBuyer).then(response => {
-      toast.success('Success Add Buyer')
-      this.setState({
-        buyersToDisplay: response.data.buyers
-      })
-    }).catch(err => toast.error(err))
   }
 
   deleteBuyer(id) {
     // axios (DELETE)
     //setState with response -> buyersToDisplay
-
-    axios.delete(`https://joes-autos.herokuapp.com/api/buyers/${id}`).then(response => {
-      toast.success('Success Delete Buyer')
-      this.setState({
-        buyersToDisplay: response.data.buyers
-      })
-    }).catch(err => toast.error(err))
   }
 
   nameSearch() {
@@ -167,13 +111,6 @@ class App extends Component {
 
     // axios (GET)
     // setState with response -> buyersToDisplay
-
-    axios.get('https://joes-autos.herokuapp.com/api/buyers').then(response => {
-      toast.success('Success Search')
-      this.setState({
-        buyersToDisplay: response.data.filter(element => element.name.includes(searchLetters))
-      })
-    }).catch(err => toast.error(err))
   }
 
   byYear() {
@@ -181,13 +118,6 @@ class App extends Component {
 
     // axios (GET)
     // setState with response -> vehiclesToDisplay
-
-    axios.get('https://joes-autos.herokuapp.com/api/vehicles').then(response => {
-      toast.success('Success Year')
-      this.setState({
-        vehiclesToDisplay: response.data.filter(element => element.year === +year)
-      })
-    })
   }
 
   // Do not edit the code below
@@ -319,7 +249,7 @@ class App extends Component {
               Filter by color
             </option>
             <option value="red">Red</option>
-            <option value="Green">Green</option>
+            <option value="green">Green</option>
             <option value="Purple">Purple</option>
             <option value="indigo">Indigo</option>
             <option value="violet">Violet</option>
